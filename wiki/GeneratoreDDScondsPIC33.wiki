@@ -1,0 +1,39 @@
+#summary Generatore DDS con dsPIC33
+
+==Generatore DDS==
+
+Questo progetto prevede l'utilizzo della tecnica detta del "Direct Digital Synthesis" [DDS] per la generazione 
+di segnali periodici. Non farò utilizzo della board; i risultati saranno fruibili attraverso il tool DMCI compreso
+nell'MPLAB.
+Questo mio progetto ovviamente non è esaustivo sull'argomento DDS. Per un approfondomento, che vi consiglio di fare, vi rimando 
+al link: [http://lionel.cordesses.free.fr/gpages/electronics.html A tool for periodic wave generation] dove l'autore ha reso disponibili in PDF due ottimi articoli usciti su "IEEE Signal Processing Magazine".
+
+
+Il progetto da aprire è il: "dsPIC 28pin xweb DDS DMCI".
+
+La parte DDS è divisa tra due file sorgente: dds.c e dds.h.
+In questi due file ci sono le funzioni base per _inizializzare_ e poi _generare_ la forma d'onda che vogliamo.
+
+La procedura di inizializzazione ci permette di definire anche una freq. Successivamente andremo a "chiedere" i sample
+della forma d'onda tramite la funzione *getDDSSampleX*. Mentre per cambiare nuovamente la frequenza ci basterà eseguire
+*SetDDSFreqX*
+
+Nel file dds.h ci sono molti _define_ importanti come: la frequenza di sampling che vogliamo utilizzare, ed il tipo di forma d'onda:
+  * sinusoidale
+  * dente di sega
+  * quadra
+
+Passiamo alla pratica:
+compilate nuovamente l'intero progetto: *Ctrl-F10*.
+Aprite dal menu _Tool_ l'item _5 DMCI..._. Nella finestra del DMCI fate click sull'icona "Load profile" e scegliete il file *dmci.dmci* all'interno del progetto
+
+A questo punto potete dare il _RUN_ premento *F9*
+
+Il programma si fermerà ad un preciso *BREAKPOINT* e la finestra DMCI vi mostrerà il contenuto dell'array *sample_array* in cui il programma ha scaricato
+i valori della forma d'onda generata.
+
+==Attività==
+Possiamo cambiare la freq. generata modificando il valore che passiamo alla *InitDDS*. 
+Il DDS permette anche di generare altre forme d'onda. Questo lo possiamo ottenere agendo su alcuni *define* presenti nel file *dds.h*.
+Nel _main_ sono definite due funzioni pensate come _generatore_, sono: *GenFreq* e *DDSGemFreq*. Ambedue riempiono l'array *sample_array* con
+una forma d'onda.
