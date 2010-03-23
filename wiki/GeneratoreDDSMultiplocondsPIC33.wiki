@@ -1,0 +1,95 @@
+#summary Generatore DDS Multiplo con dsPIC33
+
+==Generatore DDS Multiplo==
+Questa è una variante del precedente progetto; in questo caso, grazie ad una struttura dati, mantengo attivi
+quattro differenti canali di frequenza.
+
+Inoltre parlerò dell'export delle variabili dalla "Watch Window" e la visulizzazione del loro contenuto 
+tramite il programma: *dsPICWorks*.
+
+Se non lo avete già fatto potete scaricate il dsPICWorks da questo link: [http://ww1.microchip.com/downloads/en/DeviceDoc/dspicworks104.zip DownLoad dsPICWork]
+E' un buon tool per lavorare nell'ambito del Digital Signal Processing di Microchip.
+
+==Compilazione==
+Aprite il progetto "dsPIC 28pin xweb multi DDS DMCI" ed eseguite un *Ctrl-F10* per ricompilare.
+Aprite la finestra DMCI e caricate il file *dmci.dmci* presente nella directory del progetto. 
+Questo nuovo progetto aprirà anche la finestra di *watch* con impostata la variabile *sample_array*.
+Eseguite il programma con *F9*. Il codice si fermerà ad uno specifico *BREAKPOINT*.
+
+La finestra del DMCI ci visualizzerà una forma d'onda ottenuta dalla somma di quattro differenti frequenze.
+Per migliorare la *visione* di questo segnale possiamo fare così:
+  * fate click con il pulsante destro del mouse sul grafico, e selezionate *Configure Data Source*
+  * modificate il campo *Sample Count* scrivendo 128. 
+  * fate click con il mouse sul bottone *OK* per chiuderla
+_Mi raccomando fate click sul bottone e *non* battete Enter che si ripristina il valore a default_
+La finestra DMCI deve essere rinfrescata, qunidi fate click sul bottone di refresh.
+A questo punto il grafico apparirà nei soli primi 128 sample.
+
+==Descrizione del Codice==
+Il codice adesso usa delle nuove funzioni ed un array di strutture dati che ho chiamato *CHANNEL*.
+La struttura *CHANNEL* è la seguente:
+{{{
+/* Struttura per la gestione di più canali di freq. */
+typedef struct _CHANNEL {
+	int freq;
+	unsigned int adder;
+	unsigned int accumulator;
+} CHANNEL;	
+}}}
+In questa struttura ho riassunto le variabili che caratterizzano una particolare frequenza. 
+
+Per inizializzare i valori basta eseguire:
+{{{
+	/* Creo un array, grande cMAXCHAN, di strutture CHANNEL */
+	CHANNEL vChannel[ cMAXCHAN];
+	/* */
+	vChannel[0].freq=500;
+	SetDDSFreqChnl( &vChannel[0]);
+	/* */
+	vChannel[1].freq=1500;
+	SetDDSFreqChnl( &vChannel[1]);
+	...
+}}}
+
+La funzione *SetDDSFreqChnl* imposta i valori *adder* e *accumulator* adeguati alla freq. che abbiamo impostato nella variabile *freq*.
+Per recuperare il valore di un particolare canale basterà eseguire:
+{{{
+	getDDSFreqChnl( &vChannel[0], c0_DEGREE);
+}}}
+Il primo parametro che passiamo a questa funzione è la nostra struttura CHANNEL, il secondo parametro è la fase con cui vogliamo che
+il nostro segnale esca.
+A questo scopo nel file *dds.h* sono presenti questi _#define_
+{{{
+	/* */
+	#define c0_DEGREE			0
+	#define c90_DEGREE			(cLUT_SIZE/4)
+	#define c180_DEGREE			(cLUT_SIZE/2)
+}}}
+
+==Attività==
+A questo punto facciamo click con il pulsante destro del mouse sulla variabile *sample_array* nella *Watch* window.
+Scegliamo *Export Table...*; si aprirà una finestra preimpostata per esportare l'array *sample_array*. Lasciamo tutto 
+inalterato e facciamo click su *OK*. Ci verrà chiesto di scegliere un nome e di salvare la tabella.
+_Un file *sample_array.mch* è già presente nel folder del progetto._
+
+Aprite il programma *dsPICWorks* e dal menu *File* scegliete l'item *Import File...*. 
+Nella finestra che si aprirà dovrete:
+  * scegliere il file che abbiamo salvato come *Source File*, il nome del destination file verrà impostato dal programma.
+  * selezionate *Time Domain File* nel box *Import File Type*.
+  * impostate il *Sampling Rate* con il valore cui avete "runnato" il programma, a default è *44100Hz*. Il parametro lo trovate in *dds.h* e potete scegliere tra: cFS_44100, cFS_8000 e cFS_4000.
+  * scegliete come *Input FIle Format* il formato: *Fractional/Integer ASCII Hexadecimal*
+  * selezionate *1* per i "Number of Channels* .
+  
+Fate *OK* e se tutto è andato bene dovrebbe apparire la stessa foarma d'onda apparsa nel DMCI del progetto MPLAB.
+Il programma *dsPICWorks* permette di fare molte elaborazioni sul nostro segnale, troverete tutto sotto i menu:
+*Operation* e *DSP*. Buon divertimento!
+
+Ovviamente è possibile fare l'inverso: generare forme d'onda o del *rumore* in dsPICWorks ed importarlo in una variabile nel nostro 
+progetto MPLAB. O ancora meglio: istruire con uno "Stimulus" l'MPLAB a fare l'import automaticamente in un punto preciso del programma in esecuzione.
+
+
+
+
+
+
+
