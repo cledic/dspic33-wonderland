@@ -79,7 +79,7 @@ Nella finestra che si aprirà dovrete:
   * selezionate *Time Domain File* nel box *Import File Type*.
   * impostate il *Sampling Rate* con il valore cui avete "runnato" il programma, a default è *44100Hz*. Il parametro lo trovate in *dds.h* e potete scegliere tra: cFS_44100, cFS_8000 e cFS_4000.
   * scegliete come *Input FIle Format* il formato: *Fractional/Integer ASCII Hexadecimal*
-  * selezionate *1* per i "Number of Channels* .
+  * selezionate *1* per i *Number of Channels* .
   
 Fate *OK* e se tutto è andato bene dovrebbe apparire la stessa foarma d'onda apparsa nel DMCI del progetto MPLAB.
 Il programma *dsPICWorks* permette di fare molte elaborazioni sul nostro segnale, troverete tutto sotto i menu:
@@ -87,4 +87,3 @@ Il programma *dsPICWorks* permette di fare molte elaborazioni sul nostro segnale
 
 Ovviamente è possibile fare l'inverso: generare forme d'onda o del *rumore* in dsPICWorks ed importarlo in una variabile nel nostro 
 progetto MPLAB. O ancora meglio: istruire con uno "Stimulus" l'MPLAB a fare l'import automaticamente in un punto preciso del programma in esecuzione.
-
