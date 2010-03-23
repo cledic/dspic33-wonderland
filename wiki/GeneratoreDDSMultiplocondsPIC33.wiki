@@ -22,6 +22,7 @@ Per migliorare la *visione* di questo segnale possiamo fare così:
   * modificate il campo *Sample Count* scrivendo 128. 
   * fate click con il mouse sul bottone *OK* per chiuderla
 _Mi raccomando fate click sul bottone e *non* battete Enter che si ripristina il valore a default_
+
 La finestra DMCI deve essere rinfrescata, qunidi fate click sul bottone di refresh.
 A questo punto il grafico apparirà nei soli primi 128 sample.
 
@@ -86,8 +87,6 @@ Il programma *dsPICWorks* permette di fare molte elaborazioni sul nostro segnale
 
 Ovviamente è possibile fare l'inverso: generare forme d'onda o del *rumore* in dsPICWorks ed importarlo in una variabile nel nostro 
 progetto MPLAB. O ancora meglio: istruire con uno "Stimulus" l'MPLAB a fare l'import automaticamente in un punto preciso del programma in esecuzione.
-
-
 
 
 
