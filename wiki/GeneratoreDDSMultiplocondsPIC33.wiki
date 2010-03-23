@@ -4,7 +4,7 @@
 Questa è una variante del precedente progetto; in questo caso, grazie ad una struttura dati, mantengo attivi
 quattro differenti canali di frequenza.
 
-Inoltre parlerò dell'export delle variabili dalla "Watch Window" e la visulizzazione del loro contenuto ed eventualmente l'elaborazione tramite il programma: *dsPICWorks*.
+Inoltre parlerò dell'export delle variabili dalla "Watch Window" e la visulizzazione del loro contenuto, ed eventualmente anche una certa elaborazione, tramite il programma: *dsPICWorks*.
 
 Se non lo avete già fatto potete scaricate il dsPICWorks da questo link: [http://ww1.microchip.com/downloads/en/DeviceDoc/dspicworks104.zip DownLoad dsPICWork]
 E' un buon tool per lavorare nell'ambito del Digital Signal Processing di Microchip.
