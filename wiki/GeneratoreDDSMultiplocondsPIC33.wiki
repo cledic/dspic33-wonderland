@@ -55,7 +55,7 @@ Per inizializzare i valori basta eseguire:
 La funzione *SetDDSFreqChnl* imposta i valori *adder* e *accumulator* adeguati alla freq. che abbiamo impostato nella variabile *freq*.
 Per recuperare il valore di un particolare canale basterà eseguire:
 {{{
-	getDDSFreqChnl( &vChannel[0], c0_DEGREE);
+	sample_array[i++] = getDDSFreqChnl( &vChannel[0], c0_DEGREE);
 }}}
 Il primo parametro che passiamo a questa funzione è la nostra struttura CHANNEL, il secondo parametro è la fase con cui vogliamo che
 il nostro segnale esca.
@@ -87,6 +87,4 @@ Il programma *dsPICWorks* permette di fare molte elaborazioni sul nostro segnale
 
 Ovviamente è possibile fare l'inverso: generare forme d'onda o del *rumore* in dsPICWorks ed importarlo in una variabile nel nostro 
 progetto MPLAB. O ancora meglio: istruire con uno "Stimulus" l'MPLAB a fare l'import automaticamente in un punto preciso del programma in esecuzione.
-
-
 
