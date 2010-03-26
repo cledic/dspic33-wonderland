@@ -1,0 +1,101 @@
+#summary Generatore DDS Multiplo e FFT con dsPIC33
+
+==Generatore DDS Multiplo e FFT==
+In questo nuovo progetto ho aggiunto una parte DSP usando delle funzioni messe a disposizione
+dalla libreria Microchip.
+La documentazione su questa libreria la troviamo sotto questo path: 
+  * C:\Programmi\Microchip\MPLAB C30\docs\dsp_lib
+
+Per riassumere vi dirò che questa libreria è composta dai seguenti moduli:
+  * Vector Functions
+  * Window Functions
+  * Matrix Functions
+  * Filtering Functions
+  * Transform Functions
+  * Control Functions
+  * Conversion Functions
+
+Nella documentazione troverete oltre alla descrizione delle singole funzioni anche i tempi di esecuzione espressi in cicli macchina.
+Non sarò io a istruirvi/insegnarvi il DSP! Fate riferiento a questo libro on-line e scaricabile che merita proprio di essere letto:
+  * [http://www.dspguide.com/ch1.htm The Breadth and Depth of DSP]
+_Molti degli esempi nel libro sono descritti con semplici programmi in BASIC_
+
+==Compilazione==
+Aprite il progetto "dsPIC 28pin xweb multi FFT DMCI" ed eseguite un *Ctrl-F10* per ricompilare.
+Aprite la finestra DMCI e caricate il file *dmci.dmci* presente nella directory del progetto. 
+Questo nuovo progetto aprirà anche la finestra di *watch* con impostata la variabile *sample_array*.
+Eseguite il programma con *F9*. Il codice si fermerà ad uno specifico *BREAKPOINT*.
+
+La finestra del DMCI ci visualizzerà lo spettro ottenuto dal calcolo della FFT.
+Per migliorare la *visione* di quanto ottenuto possiamo fare così:
+  * fate click con il pulsante destro del mouse sul grafico, e selezionate *Configure Data Source*
+  * modificate il campo *Sample Count* scrivendo 64. 
+  * fate click con il mouse sul bottone *OK* per chiuderla
+_Mi raccomando fate click sul bottone e *non* battete Enter che si ripristina il valore a default_
+
+La finestra DMCI deve essere rinfrescata, quindi fate click sul bottone di refresh.
+A questo punto nel grafico appariranno solo i primi 64 sample.
+
+==Il risultato==
+Quello che vediamo  visualizzato nel DMCI è lo spettro di frequenze che la FFT ha calcolato.
+Detto in maniera semplice: dando in "pasto" alla FFT i sample del nostro segnale, abbiamo ottenuto una indicazione
+delle frequenze che lo compongono. Il numero di picchi, la loro posizione e la loro grandezza ci dicono il numero di segnali 
+dominanti, la loro frequenza e la loro ampiezza.
+
+==Analisi del codice==
+Diamo un'occhiata veloce al codice.
+
+===Preparazione della Hanning window e applicazione al nostro segnale:===
+{{{
+	/* 1. Genero la Hanning window. */
+	HanningInit( FFT_BLOCK_LENGTH, &vHannWind[0]);
+	
+	/* 1.1 Applico la Hanning window sul segnale. */
+	VectorWindow( FFT_BLOCK_LENGTH, &sample_array[0], &sample_array[0], &vHannWind[0]);
+
+	/* 1.2 Se bloccate qui il programma vedrete l'effetto della finestra sul nostro segnale. */
+	cBREAKPOINTHERE;
+}}}
+Il secondo grafico nella finestra DMCI mostra proprio il contenuto dell'array vHannWind.
+Mentre se impostate un breack point dove vi ho indicato, la finestra DMCI vi farà vedere l'effetto della finestratura sul nostro segnale.
+
+===Manipolazione dei sample===
+I dati che abbiamo generato con il nostro DDS, così come gli eventuali sample campionati dall'ADC del nostro dsPIC33, devono essere _manipolati_
+prima di essere dati in pasto alla funzione FFT.
+{{{
+	/* 2. Copio l'intero contenuto dell'array spectrum[] nell'array sigCmpx[] */
+	/* In questo caso la copia non terrà conto della struttura che abbiamo dato all'array: .real e .imag */
+	/* I dati verranno copiati uno di seguito all'altro, come in un array classico. */
+	/* La distribuzione dei valori nella componente .real e l'azzeramento della parte .imag la faremo dopo. */
+	VectorCopy( FFT_BLOCK_LENGTH, &sigCmpx[0].real, &sample_array[0]);
+		
+	/* 2.1 Questa funzione, scritta in ASM, carica i valori del segnale nella componente .real ed azzera la componente .imag [51us] */
+	/* inoltre per evitare che il calcolo della FFT saturi nei valori, i sample vengono portati dai valori 1, -1 a 0.5, -0.5 */
+	/* La funzione eseguita in ASM è decisamente più performante del "for loop" proposto nella versione originale del codice da Microchip. */
+	NormalizeSample( &sigCmpx[0], FFT_BLOCK_LENGTH);
+}}}
+
+===Calcolo della FFT===
+{{{
+	/* 3. Perform FFT operation La funzione è In-Place cioè il risultato è nell'array sigCmpx fornito come input.*/
+	FFTComplexIP (LOG2_BLOCK_LENGTH, &sigCmpx[0], (fractcomplex *) __builtin_psvoffset(&twiddleFactors[0]), (int) __builtin_psvpage(&twiddleFactors[0]));
+	
+	/* 4. Store output samples in bit-reversed order of their addresses */
+	BitReverseComplex (LOG2_BLOCK_LENGTH, &sigCmpx[0]);
+	
+	/* 5. Compute the square magnitude of the complex FFT output array so we have a Real output vetor */
+	SquareMagnitudeCplx(FFT_BLOCK_LENGTH, &sigCmpx[0], &sample_array[0]);
+}}}
+Questo è il vero e proprio calcolo della FFT. La funzione che ho usato è detta In-Place perché pone i risultati del calcolo
+nello stesso array che era usato come sorgente. Le funzioni successive alla FFT sono tutte necessarie per ottenere lo spettro
+delle frequenze.
+
+==Analisi dello Spettro==
+La FFT che ho fatto eseguire al programma è a 512 punti. Il valore di frequenza per ogni bin è:
+  * Fs / N = 44100/512 = circa 86
+I valori per noi utili vanno da 0 a 255, lo spettro poi si ripete specularmente.
+Il valore di ogni frequenza si calcola moltiplicando il numero del bin per il valore 86. Per le frequenze che non sono multiplo del bin bisogna considerare anche i valori dei 
+bin precedenti e successivi ed eseguire un calcolo di interpolazione per ricavare il 
+valore di frequenza esatta.
+
+
