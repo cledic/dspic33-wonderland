@@ -1,4 +1,5 @@
 #summary Generatore DDS Multiplo e FFT con dsPIC33
+#labels DSP
 
 ==Generatore DDS Multiplo e FFT==
 In questo nuovo progetto ho aggiunto una parte DSP usando delle funzioni messe a disposizione
@@ -97,5 +98,3 @@ I valori per noi utili vanno da 0 a 255, lo spettro poi si ripete specularmente.
 Il valore di ogni frequenza si calcola moltiplicando il numero del bin per il valore 86. Per le frequenze che non sono multiplo del bin bisogna considerare anche i valori dei 
 bin precedenti e successivi ed eseguire un calcolo di interpolazione per ricavare il 
 valore di frequenza esatta.
-
-
